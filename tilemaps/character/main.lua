@@ -2,14 +2,19 @@ LoadLibrary("Renderer")
 LoadLibrary("Sprite")
 LoadLibrary("System")
 LoadLibrary("Texture")
+LoadLibrary("Vector")
 LoadLibrary("Asset")
 LoadLibrary("Keyboard")
 
-
 Asset.Run("Map.lua")
 Asset.Run("Util.lua")
-Asset.Run("small_room.lua")
 Asset.Run("Entity.lua")
+Asset.Run("StateMachine.lua")
+Asset.Run("MoveState.lua")
+Asset.Run("WaitState.lua")
+Asset.Run("Tween.lua")
+Asset.Run("small_room.lua")
+
 
 local gMap = Map:Create(CreateMap1())
 gRenderer = Renderer:Create()
@@ -26,35 +31,37 @@ local heroDef =
 	tileY          = 2
 }
 
-gHero = Entity:Create(heroDef)
+local gHero
+gHero = 
+{
+	mEntity = Entity:Create(heroDef),
+	Init =
+	function(self)
+		self.mController = StateMachine:Create
+	    {
+            ['wait'] = function() return WaitState:Create(gHero, gMap) end,
+            ['move'] = function() return MoveState:Create(gHero, gMap) end
+        }
+        self.mWaitState = WaitState:Create(self, gMap)
+        self.mMoveState = MoveState:Create(self, gMap)
+        self.mController:Change("wait")
+    end
+}
+
+gHero:Init()
 
 function Teleport(entity, map)
     local x, y = map:GetTileFoot(entity.mTileX, entity.mTileY)
 	entity.mSprite:SetPosition(x, y + entity.mHeight / 2)
 end
-Teleport(gHero, gMap)
+Teleport(gHero.mEntity, gMap)
 
 function update()
+    local dt = GetDeltaTime()
+
     gRenderer:Translate(-gMap.mCamX, -gMap.mCamY)
     gMap:Render(gRenderer)
-    gRenderer:DrawSprite(gHero.mSprite)
+    gRenderer:DrawSprite(gHero.mEntity.mSprite)
 
-    if Keyboard.JustPressed(KEY_LEFT) then
-    	gHero.mTileX = gHero.mTileX - 1
-    	Teleport(gHero, gMap)
-    elseif Keyboard.JustPressed(KEY_RIGHT) then
-    	gHero.mTileX = gHero.mTileX + 1
-    	Teleport(gHero, gMap)
-    end
-
-    if Keyboard.JustPressed(KEY_UP) then
-    	gHero.mTileY = gHero.mTileY - 1
-    	Teleport(gHero, gMap)
-    elseif Keyboard.JustPressed(KEY_DOWN) then
-    	gHero.mTileY = gHero.mTileY + 1
-    	Teleport(gHero, gMap)
-    end
-
-
-
+    gHero.mController:Update(dt)
 end

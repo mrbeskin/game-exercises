@@ -17,13 +17,29 @@ manifest =
         {
             path = "Util.lua"
         },
+        ['Entity.lua'] =
+        {
+            path = "Entity.lua"
+        },
+        ['Tween.lua'] =
+        {
+            path = "Tween.lua"
+        },
+        ['StateMachine.lua'] =
+        {
+            path = "StateMachine.lua"
+        },
         ['small_room.lua'] =
         {
             path = "small_room.lua"
         },
-        ['Entity.lua'] = 
+        ['MoveState.lua'] =
         {
-           path = "Entity.lua"
+            path = "MoveState.lua"
+        },
+        ["WaitState.lua"] =
+        {
+            path = "WaitState.lua"
         }
     },
     textures =
