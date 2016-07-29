@@ -77,6 +77,11 @@ function Map:GetTile(x, y)
     return self.mTiles[x + y * self.mWidth]
 end
 
+function Map:GetTileFoot(x, y)
+    return self.mX + (x * self.mTileWidth),
+           self.mY - (y * self.mTileHeight) - self.mTileHeight / 2
+end
+
 function Map:Render(renderer)
 
     local tileLeft, tileBottom =
