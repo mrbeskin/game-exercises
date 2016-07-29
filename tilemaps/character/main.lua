@@ -9,58 +9,50 @@ LoadLibrary("Keyboard")
 Asset.Run("Map.lua")
 Asset.Run("Util.lua")
 Asset.Run("small_room.lua")
+Asset.Run("Entity.lua")
 
 local gMap = Map:Create(CreateMap1())
 gRenderer = Renderer:Create()
 
 gMap:GotoTile(5, 5)
 
-gHeroTexture = Texture.Find("walk_cycle.png")
-local heroWidth = 16
-local heroHeight = 24
-gHeroUVs = GenerateUVs(heroWidth,
-	                   heroHeight,
-	                   gHeroTexture)
-gHeroSprite = Sprite:Create()
-gHeroSprite:SetTexture(gHeroTexture)
-gHeroSprite:SetUVs(unpack(gHeroUVs[9]))
+local heroDef = 
+{
+	texture = "walk_cycle.png",
+	width          = 16,
+	height         = 24,
+	startFrame     = 9,
+	tileX          = 10,
+	tileY          = 2
+}
 
-gHeroTileX = 10
-gHeroTileY = 2
+gHero = Entity:Create(heroDef)
 
-local x, y = gMap:GetTileFoot(gHeroTileX, gHeroTileY)
-gHeroSprite:SetPosition(x, y + heroHeight / 2)
-
-function Teleport(tileX, tileY, map)
-	local x, y = map:GetTileFoot(tileX, tileY)
-	gHeroSprite:SetPosition(x,
-		                    y + heroHeight / 2)
+function Teleport(entity, map)
+    local x, y = map:GetTileFoot(entity.mTileX, entity.mTileY)
+	entity.mSprite:SetPosition(x, y + entity.mHeight / 2)
 end
-
-gHeroX = 10
-gHeroY = 2
-Teleport(gHeroX, gHeroY, gMap)
+Teleport(gHero, gMap)
 
 function update()
     gRenderer:Translate(-gMap.mCamX, -gMap.mCamY)
     gMap:Render(gRenderer)
-    gRenderer:DrawSprite(gHeroSprite)
+    gRenderer:DrawSprite(gHero.mSprite)
 
     if Keyboard.JustPressed(KEY_LEFT) then
-    	gHeroX = gHeroX - 1
-    	Teleport(gHeroX, gHeroY, gMap)
+    	gHero.mTileX = gHero.mTileX - 1
+    	Teleport(gHero, gMap)
     elseif Keyboard.JustPressed(KEY_RIGHT) then
-    	gHeroX = gHeroX + 1
-    	Teleport(gHeroX, gHeroY, gMap)
+    	gHero.mTileX = gHero.mTileX + 1
+    	Teleport(gHero, gMap)
     end
 
     if Keyboard.JustPressed(KEY_UP) then
-    	gHeroY = gHeroY - 1
-    	Teleport(gHeroX, gHeroY, gMap)
-
+    	gHero.mTileY = gHero.mTileY - 1
+    	Teleport(gHero, gMap)
     elseif Keyboard.JustPressed(KEY_DOWN) then
-    	gHeroY = gHeroY + 1
-    	Teleport(gHeroX, gHeroY, gMap)
+    	gHero.mTileY = gHero.mTileY + 1
+    	Teleport(gHero, gMap)
     end
 
 
