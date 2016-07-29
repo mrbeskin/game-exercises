@@ -4,8 +4,10 @@ LoadLibrary("System")
 LoadLibrary("Texture")
 LoadLibrary("Asset")
 
+
+Asset.Run("Map.lua")
 Asset.Run("larger_map.lua")
-gTiledMap = CreateMap1()
+
 
 function GenerateUVs(tileWidth, tileHeight, texture)
 
@@ -44,46 +46,10 @@ function GenerateUVs(tileWidth, tileHeight, texture)
     return uvs
 end
 
-gTextureAtlas = Texture.Find(gTiledMap.tilesets[1].image)
-gUVs = GenerateUVs(
-    gTiledMap.tilesets[1].tilewidth,
-    gTiledMap.tilesets[1].tileheight,
-    gTextureAtlas)
 
--- Get Screen Dimensions
-gDisplayWidth = System.ScreenWidth()
-gDisplayHeight = System.ScreenHeight()
-
-function GetTile(map, rowsize, x, y)
-	x = x + 1
-	return map[x + y * rowsize]
-end
-
-gRenderer = Renderer.Create()
-
-gTileSprite = Sprite.Create()
-gTileSprite:SetTexture(gTextureAtlas)
-
-gMap = gTiledMap.layers[1]
-gMapHeight = gMap.height
-gMapWidth = gMap.width
-gTileWidth = gTiledMap.tilesets[1].tilewidth
-gTileHeight = gTiledMap.tilesets[1].tileheight
-gTiles = gMap.data
-
-gLeft = -gDisplayWidth / 2 + gTileWidth / 2
-gTop = gDisplayHeight / 2 - gTileHeight / 2
+local gMap = Map:Create(CreateMap1())
+gRenderer = Renderer:Create()
 
 function update()
-	for j = 0, gMapHeight - 1 do
-	    for i = 0, gMapWidth - 1  do
-	    	local tile = GetTile(gTiles, gMapWidth, i, j)
-	    	local uvs = gUVs[tile]
-	    	gTileSprite:SetUVs(unpack(uvs))
-	    	gTileSprite:SetPosition(
-	    		gLeft + i * gTileWidth,
-	    		gTop - j * gTileWidth)
-    	   gRenderer:DrawSprite(gTileSprite)
-        end
-    end
+    gMap:Render(gRenderer)
 end

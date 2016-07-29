@@ -16,6 +16,14 @@ manifest =
         ['larger_map.lua'] =
         {
             path = "larger_map.lua"
+        },
+        ['tiles.lua'] =
+        {
+            path = "tiles.lua"
+        },
+        ['Map.lua'] =
+        {
+            path = "Map.lua"
         }
     },
     textures =
