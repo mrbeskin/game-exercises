@@ -37,9 +37,13 @@ manifest =
         {
             path = "MoveState.lua"
         },
-        ["WaitState.lua"] =
+        ['WaitState.lua'] =
         {
             path = "WaitState.lua"
+        },
+        ['Animation.lua'] =
+        {
+            path = "Animation.lua"
         }
     },
     textures =

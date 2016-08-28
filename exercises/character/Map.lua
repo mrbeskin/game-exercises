@@ -36,6 +36,14 @@ function Map:Create(mapDef)
                             mapDef.tilesets[1].tileheight,
                             this.mTextureAtlas)
 
+    for _, v in ipairs(mapDef.tilesets) do
+        if v.name == "collision_graphic" then
+            this.mBlockingTile = v.firstgid
+        end
+    end
+
+    assert(this.mBlockingTile)
+
     setmetatable(this, self)
 
     return this
@@ -71,12 +79,20 @@ function Map:PointToTile(x, y)
     return tileX, tileY
 end
 
-function Map:GetTile(x, y)
+function Map:GetTile(x, y, layer)
+    local layer = layer or 1
+    local tiles = self.mMapDef.layers[layer].data
     x = x + 1 -- change from  1 -> rowsize
               -- to           0 -> rowsize - 1
-    return self.mTiles[x + y * self.mWidth]
+    return tiles[x + y * self.mWidth]
 end
 
+function Map:IsBlocked(layer, tileX, tileY)
+    -- Collision layer should always be 1 above the official layer
+    local tile = self:GetTile(tileX, tileY, layer + 2)
+    print(tileX, tileY, layer, tile, tile == self.mBlockingTile)
+    return tile == self.mBlockingTile
+end
 function Map:GetTileFoot(x, y)
     return self.mX + (x * self.mTileWidth),
            self.mY - (y * self.mTileHeight) - self.mTileHeight / 2
@@ -104,6 +120,13 @@ function Map:Render(renderer)
                                          self.mY - j * self.mTileHeight)
 
             renderer:DrawSprite(self.mTileSprite)
+
+            tile = self:GetTile(i, j, 2)
+            if tile > 0 then
+                uvs = self.mUVs[tile]
+                self.mTileSprite:SetUVs(unpack(uvs))
+                renderer:DrawSprite(self.mTileSprite)
+           end
         end
     end
 end
